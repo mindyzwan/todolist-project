@@ -1,0 +1,46 @@
+<!-- Header-->
+<section id="todos">
+  <header>
+    <h2><%= @list[:name] %></h2>
+    <ul>
+      <li>
+        <a href="/lists/<%= @list_id %>/edit" class="edit">Edit list</a>
+      </li>
+    </ul>
+  </header>
+
+  <ul>
+    <% @list[:todos].each_with_index do |todo, index| %>
+    <li>
+      <h3><%= todo[:name] %></h3>
+      <form action="/lists/<%= @list_id %>/todos/<%= index.to_s %>/complete" method="post" class="check">
+        <input type="hidden" name="completed" value="" />
+        <button type="submit">Complete</button>
+      </form>
+      <form action="/lists/<%= @list_id %>/todos/<%= index.to_s %>/delete" method="post" class="delete">
+        <button type="submit">Delete</button>
+      </form>
+    </li>
+    <% end %>
+  </ul>
+</section>
+
+<!-- Nav Button -->
+<% content_for :nav_link do %>
+  <a class="list" href="/lists">All Lists</a>
+<% end %>
+
+<!-- Add new todos functionality -->
+<form action="/lists/<%= @list_id %>/todos" method="post">
+  <dl>
+    <dt>
+      <label for="todo">Enter a new todo item:</label>
+    </dt>
+    <dd>
+      <input name="todo" id="todo" placeholder="Something to do" type="text" value="<%= params[:todo] %>">
+    </dd>
+  </dl>
+  <fieldset class="actions">
+    <input type="submit" value="Add">
+  </fieldset>
+</form>
