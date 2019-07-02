@@ -60,14 +60,6 @@ helpers do
       "Todo must be between 1 and 100 characters."
     end
   end
-
-  def load_list(index)
-    list = session[:lists][index] if index && session[:lists][index]
-    return list if list
-
-    session[:error] = "The specified list was not found."
-    redirect "/lists"
-  end
 end
 
 before do
@@ -75,6 +67,14 @@ before do
 end
 
 get "/" do
+  redirect "/lists"
+end
+
+def load_list(index)
+  list = session[:lists][index] if index && session[:lists][index]
+  return list if list
+
+  session[:error] = "The specified list was not found."
   redirect "/lists"
 end
 
