@@ -20,6 +20,11 @@ helpers do
     "complete" if list_complete?(list)
   end
 
+  # Returns class for todo
+  def todo_class(todo)
+    "complete" if todo[:completed]
+  end
+
   # Returns total todos in a list
   def todos_count(list)
     list[:todos].size
@@ -66,15 +71,15 @@ before do
   session[:lists] ||= []
 end
 
-get "/" do
-  redirect "/lists"
-end
-
 def load_list(index)
   list = session[:lists][index] if index && session[:lists][index]
   return list if list
 
   session[:error] = "The specified list was not found."
+  redirect "/lists"
+end
+
+get "/" do
   redirect "/lists"
 end
 
@@ -191,4 +196,3 @@ post "/lists/:listid/todos/complete_all" do
   session[:success] = "All todos have been updated."
   redirect "/lists/#{@list_id}"
 end
-
