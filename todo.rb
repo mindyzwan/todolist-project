@@ -171,12 +171,8 @@ post "/lists/:listid/todos/:todoid/delete" do
   todo_id = params[:todoid].to_i
   @todos.delete_at(todo_id)
 
-  if env["HTTP_X_REQUESTED_WITH"] = "XMLHTTPREQUEST"
-    status 204
-  else
-    session[:success] = "The todo has been deleted."
-    redirect "/lists/#{@list_id}"
-  end
+  session[:success] = "The todo has been deleted."
+  redirect "/lists/#{@list_id}"
 end
 
 # Marks todo items as complete/incomplete
