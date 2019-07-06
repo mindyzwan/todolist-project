@@ -143,13 +143,8 @@ end
 post "/lists/:listid/delete" do
   id = params[:listid].to_i
   session[:lists].delete_at(id)
-
-  if env["HTTP_X_REQUESTED_WITH"] = "XMLHTTPREQUEST"
-    "/lists"
-  else
-    session[:success] = "The list has been deleted."
-    redirect "/lists"
-  end
+  session[:success] = "The list has been deleted."
+  redirect "/lists"
 end
 
 # Adds todo items to a list
