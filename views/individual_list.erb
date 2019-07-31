@@ -16,14 +16,14 @@
 
 <!-- List of Todos -->
   <ul>
-    <% sort_todos(@list[:todos]) do |todo, index| %>
+    <% sort_todos(@list[:todos]) do |todo| %>
     <li class="<%= todo_class(todo) %>">
       <h3><%= todo[:name] %></h3>
-      <form action="/lists/<%= @list_id %>/todos/<%= index.to_s %>/complete" method="post" class="check">
+      <form action="/lists/<%= @list_id %>/todos/<%= todo[:id] %>/complete" method="post" class="check">
         <input type="hidden" name="completed" value="<%= !todo[:completed] %>" />
         <button type="submit">Complete</button>
       </form>
-      <form action="/lists/<%= @list_id %>/todos/<%= index.to_s %>/delete" method="post" class="delete">
+      <form action="/lists/<%= @list_id %>/todos/<%= todo[:id] %>/delete" method="post" class="delete">
         <button type="submit">Delete</button>
       </form>
     </li>

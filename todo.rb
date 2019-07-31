@@ -43,32 +43,13 @@ helpers do
     complete_lists.each { |list| yield list, lists.index(list) }
   end
 
+  # Sorts completed todos to the bottom
   def sort_todos(todos, &block)
     complete_todos, incomplete_todos = todos.partition { |todo| todo[:completed] }
 
     incomplete_todos.each { |todo| yield todo, todos.index(todo) }
     complete_todos.each { |todo| yield todo, todos.index(todo) }
   end
-
-  # Return an error message if the name is invalid. Return nil if name is valid.
-  def error_for_list_name(name)
-    if !(1..100).cover?(name.size)
-      "List name must be between 1 and 100 characters."
-    elsif session[:lists].any? { |list| list[:name] == name }
-      "List name must be unique."
-    end
-  end
-
-  # Return an error message if the name is invalid. Return nil if name is valid.
-  def error_for_todo_name(name)
-    if !(1..100).cover?(name.size)
-      "Todo must be between 1 and 100 characters."
-    end
-  end
-end
-
-before do
-  session[:lists] ||= []
 end
 
 def load_list(index)
@@ -77,6 +58,32 @@ def load_list(index)
 
   session[:error] = "The specified list was not found."
   redirect "/lists"
+end
+
+# Return an error message if the name is invalid. Return nil if name is valid.
+def error_for_list_name(name)
+  if !(1..100).cover?(name.size)
+    "List name must be between 1 and 100 characters."
+  elsif session[:lists].any? { |list| list[:name] == name }
+    "List name must be unique."
+  end
+end
+
+# Return an error message if the name is invalid. Return nil if name is valid.
+def error_for_todo_name(name)
+  if !(1..100).cover?(name.size)
+    "Todo must be between 1 and 100 characters."
+  end
+end
+
+# Returns the next id number for a new todo item.
+def next_id(todos)
+  max = todos.map { |todo| todo[:id] }.max || 0
+  max + 1
+end
+
+before do
+  session[:lists] ||= []
 end
 
 get "/" do
@@ -143,8 +150,13 @@ end
 post "/lists/:listid/delete" do
   id = params[:listid].to_i
   session[:lists].delete_at(id)
-  session[:success] = "The list has been deleted."
-  redirect "/lists"
+
+  if env["HTTP_X_REQUESTED_WITH"] == "XMLHttpRequest"
+    "/lists"
+  else
+    session[:success] = "The list has been deleted."
+    redirect "/lists"
+  end
 end
 
 # Adds todo items to a list
@@ -154,12 +166,14 @@ post "/lists/:listid/todos" do
 
   todo_name = params[:todo].strip
   error = error_for_todo_name(todo_name)
+
   if error
     session[:error] = error
     erb :individual_list
   else
-    @list[:todos] << {name: todo_name, completed: false}
-    session[:success] = "The todo was aaded."
+    id = next_id(@list[:todos])
+    @list[:todos] << {id: id, name: todo_name, completed: false}
+    session[:success] = "The todo was added."
     redirect "lists/#{@list_id}"
   end
 end
@@ -168,17 +182,23 @@ end
 post "/lists/:listid/todos/:todoid/delete" do
   @list_id = params[:listid].to_i
   @todos = load_list(@list_id)[:todos]
-  todo_id = params[:todoid].to_i
-  @todos.delete_at(todo_id)
+  @todo = @todos.find { |todo| todo[:id] == params[:todoid].to_i }
 
-  session[:success] = "The todo has been deleted."
-  redirect "/lists/#{@list_id}"
+  @todos.delete(@todo)
+
+  if env["HTTP_X_REQUESTED_WITH"] == "XMLHttpRequest"
+    status 204
+  else
+    session[:success] = "The todo has been deleted."
+    redirect "/lists/#{@list_id}"
+  end
 end
 
 # Marks todo items as complete/incomplete
 post "/lists/:listid/todos/:todoid/complete" do
   @list_id = params[:listid].to_i
-  @todo = load_list(@list_id)[:todos][params[:todoid].to_i]
+  @todos = load_list(@list_id)[:todos]
+  @todo = @todos.find { |todo| todo[:id] == params[:todoid].to_i }
 
   is_completed = params[:completed] == "true"
   @todo[:completed] = is_completed
