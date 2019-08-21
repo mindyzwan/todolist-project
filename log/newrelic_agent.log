@@ -1,0 +1,16 @@
+# Logfile created on 2019-08-21 06:09:39 +0000 by logger.rb/66358
+[2019-08-21 06:09:39 +0000 ip-172-31-34-240 (9674)] INFO : Starting the New Relic agent version 6.5.0.357 in "development" environment.
+[2019-08-21 06:09:39 +0000 ip-172-31-34-240 (9674)] INFO : To prevent agent startup add a NEW_RELIC_AGENT_ENABLED=false environment variable or modify the "development" section of your newrelic.yml.
+[2019-08-21 06:09:39 +0000 ip-172-31-34-240 (9674)] INFO : Reading configuration from config/newrelic.yml (/home/ec2-user/environment/to_do_list_app)
+[2019-08-21 06:09:39 +0000 ip-172-31-34-240 (9674)] INFO : Environment: development
+[2019-08-21 06:09:39 +0000 ip-172-31-34-240 (9674)] INFO : Dispatcher: puma
+[2019-08-21 06:09:39 +0000 ip-172-31-34-240 (9674)] INFO : Application: Todo Project (Development)
+[2019-08-21 06:09:39 +0000 ip-172-31-34-240 (9674)] INFO : Deferring startup of agent reporting thread because puma may fork.
+[2019-08-21 06:09:39 +0000 ip-172-31-34-240 (9674)] INFO : Installing Sinatra instrumentation
+[2019-08-21 06:09:39 +0000 ip-172-31-34-240 (9674)] INFO : Installing deferred Rack::Builder instrumentation
+[2019-08-21 06:09:39 +0000 ip-172-31-34-240 (9674)] INFO : Installing Rack::Builder middleware instrumentation
+[2019-08-21 06:09:39 +0000 ip-172-31-34-240 (9674)] INFO : Installing deferred Puma::Rack::Builder instrumentation
+[2019-08-21 06:09:39 +0000 ip-172-31-34-240 (9674)] INFO : Installing Puma::Rack::Builder middleware instrumentation
+[2019-08-21 06:09:39 +0000 ip-172-31-34-240 (9674)] INFO : Installing Net instrumentation
+[2019-08-21 06:09:39 +0000 ip-172-31-34-240 (9674)] INFO : Finished instrumentation
+[2019-08-21 06:09:39 +0000 ip-172-31-34-240 (9674)] INFO : Doing deferred dependency-detection before Rack startup
