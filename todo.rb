@@ -1,12 +1,18 @@
 require "sinatra"
-require "sinatra/reloader" if development?
 require "sinatra/content_for"
 require "tilt/erubis"
+
+require_relative "database_persistence"
 
 configure do
   enable :sessions
   set :session_secret, 'secret'
   set :erb, :escape_html => true
+end
+
+configure(:development) do
+  require "sinatra/reloader"
+  also_reload "database_persistence.rb"
 end
 
 helpers do
@@ -39,74 +45,16 @@ helpers do
   def sort_lists(lists, &block)
     complete_lists, incomplete_lists = lists.partition { |list| list_complete?(list) }
 
-    incomplete_lists.each { |list| yield list, lists.index(list) }
-    complete_lists.each { |list| yield list, lists.index(list) }
+    incomplete_lists.each { |list| yield list }
+    complete_lists.each { |list| yield list }
   end
 
   # Sorts completed todos to the bottom
   def sort_todos(todos, &block)
     complete_todos, incomplete_todos = todos.partition { |todo| todo[:completed] }
 
-    incomplete_todos.each { |todo| yield todo, todos.index(todo) }
-    complete_todos.each { |todo| yield todo, todos.index(todo) }
-  end
-end
-
-class SessionPersistence
-  def initialize(session)
-    @session = session
-    @session[:lists] ||= []
-  end
-
-  def find_list(id)
-    @session[:lists].find { |list| list[:id] == id }
-  end
-
-  def all_lists
-    @session[:lists]
-  end
-
-  def create_new_list(list_name)
-    new_id = next_id(@session[:lists])
-    @session[:lists] << { id: new_id, name: list_name, todos: [] }
-  end
-
-  def delete_list(id)
-    @session[:lists].reject! { |list| list[:id] == id }
-  end
-
-  def update_list_name(list_name, list_id)
-    list = find_list(list_id)
-    list[:name] = list_name
-  end
-
-  def create_new_todo(list_id, todo_name)
-    list = find_list(list_id)
-    new_id = next_id(list[:todos])
-    list[:todos] << {id: new_id, name: todo_name, completed: false}
-  end
-
-  def delete_todo(list_id, todo_id)
-    list = find_list(list_id)
-    list[:todos].reject! { |todo| todo[:id] == todo_id }
-  end
-
-  def update_todo_status(list_id, todo_id, new_status)
-    list = find_list(list_id)
-    todo = list[:todos].find { |t| t[:id] == todo_id }
-    todo[:completed] = new_status
-  end
-
-  def mark_all_todos_complete(list_id)
-    list = find_list(list_id)
-    list[:todos].each { |todo| todo[:completed] = true }
-  end
-
-  private
-
-  def next_id(collection)
-    max = collection.map { |element| element[:id] }.max || 0
-    max + 1
+    incomplete_todos.each { |todo| yield todo }
+    complete_todos.each { |todo| yield todo }
   end
 end
 
@@ -135,7 +83,7 @@ def error_for_todo_name(name)
 end
 
 before do
-  @storage = SessionPersistence.new(session)
+  @storage = DatabasePersistence.new(logger)
 end
 
 get "/" do

@@ -6,6 +6,7 @@ GEM
     multi_json (1.12.1)
     newrelic_rpm (6.5.0.357)
     nio4r (2.4.0)
+    pg (1.1.4)
     puma (4.0.1)
       nio4r (~> 2.0)
     rack (1.6.4)
@@ -32,6 +33,7 @@ PLATFORMS
 DEPENDENCIES
   erubis
   newrelic_rpm
+  pg
   puma
   sinatra (~> 1.4.7)
   sinatra-contrib
